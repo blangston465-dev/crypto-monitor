@@ -447,8 +447,35 @@
                 this.lastCheckDate = null;
                 this.currentMethod = 'emailjs';
                 this.monitoringOptions = ['crypto']; // Default to crypto only
+                
+                // Pre-filled EmailJS settings - never need to enter again!
+                this.defaultSettings = {
+                    emailjsKey: "D4hLX0Ci5dvUDyB1y",
+                    serviceId: "service_dav87mj",
+                    templateId: "template_32lyq0e"
+                };
+                
                 this.loadData();
                 this.scheduleChecks();
+                this.initializeSettings();
+            }
+            
+            initializeSettings() {
+                // Auto-fill EmailJS settings if not already filled
+                if (!document.getElementById('emailjsKey').value) {
+                    document.getElementById('emailjsKey').value = this.defaultSettings.emailjsKey;
+                }
+                if (!document.getElementById('serviceId').value) {
+                    document.getElementById('serviceId').value = this.defaultSettings.serviceId;
+                }
+                if (!document.getElementById('templateId').value) {
+                    document.getElementById('templateId').value = this.defaultSettings.templateId;
+                }
+                
+                // Initialize EmailJS immediately
+                emailjs.init(this.defaultSettings.emailjsKey);
+                
+                this.log("✅ EmailJS settings pre-configured and ready!", "success");
             }
             
             loadData() {
@@ -462,7 +489,23 @@
                         this.newToday = data.newToday || 0;
                         this.lastCheckDate = data.lastCheckDate;
                         this.monitoringOptions = data.monitoringOptions || ['crypto'];
-                        this.log("📁 Loaded previous tracking data", "info");
+                        
+                        // Load saved EmailJS settings
+                        if (data.emailjsKey) document.getElementById('emailjsKey').value = data.emailjsKey;
+                        if (data.serviceId) document.getElementById('serviceId').value = data.serviceId;
+                        if (data.templateId) document.getElementById('templateId').value = data.templateId;
+                        if (data.email) document.getElementById('email').value = data.email;
+                        if (data.notificationTime) document.getElementById('notificationTime').value = data.notificationTime;
+                        if (data.webhookUrl) document.getElementById('webhookUrl').value = data.webhookUrl;
+                        if (data.currentMethod) {
+                            this.currentMethod = data.currentMethod;
+                            this.selectMethodUI(data.currentMethod);
+                        }
+                        if (data.selectedMonitoring) {
+                            this.selectMonitoringUI(data.selectedMonitoring);
+                        }
+                        
+                        this.log("📁 Loaded previous settings and data", "info");
                     } catch (e) {
                         this.log("❌ Error loading data, starting fresh", "warning");
                     }
@@ -478,6 +521,17 @@
                     newToday: this.newToday,
                     lastCheckDate: this.lastCheckDate,
                     monitoringOptions: this.monitoringOptions,
+                    
+                    // Save EmailJS and other settings
+                    emailjsKey: document.getElementById('emailjsKey').value,
+                    serviceId: document.getElementById('serviceId').value,
+                    templateId: document.getElementById('templateId').value,
+                    email: document.getElementById('email').value,
+                    notificationTime: document.getElementById('notificationTime').value,
+                    webhookUrl: document.getElementById('webhookUrl').value,
+                    currentMethod: this.currentMethod,
+                    selectedMonitoring: this.getSelectedMonitoring(),
+                    
                     timestamp: new Date().toISOString()
                 };
                 localStorage.setItem('marketMonitorData', JSON.stringify(data));
@@ -748,9 +802,50 @@
                 logDiv.appendChild(entry);
                 logDiv.scrollTop = logDiv.scrollHeight;
             }
+            
+            selectMethodUI(method) {
+                document.querySelectorAll('.method-option').forEach(el => el.classList.remove('selected'));
+                document.querySelector(`[onclick="selectMethod('${method}')"]`).closest('.method-option').classList.add('selected');
+                
+                document.getElementById('emailjs-setup').style.display = method === 'emailjs' ? 'block' : 'none';
+                document.getElementById('webhook-setup').style.display = method === 'webhook' ? 'block' : 'none';
+                document.getElementById('browser-setup').style.display = method === 'browser' ? 'block' : 'none';
+            }
+            
+            selectMonitoringUI(option) {
+                document.querySelectorAll('.option-card').forEach(el => el.classList.remove('selected'));
+                const optionMap = {
+                    'crypto': 0,
+                    'stocks_volume': 1,
+                    'stocks_market_cap': 2,
+                    'all': 3
+                };
+                if (optionMap[option] !== undefined) {
+                    document.querySelectorAll('.option-card')[optionMap[option]].classList.add('selected');
+                }
+            }
+            
+            getSelectedMonitoring() {
+                if (this.monitoringOptions.length === 3) return 'all';
+                return this.monitoringOptions[0] || 'crypto';
+            }
         }
         
         const monitor = new EnhancedMarketMonitor();
+        
+        // Auto-save settings when user types
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = ['emailjsKey', 'serviceId', 'templateId', 'email', 'notificationTime', 'webhookUrl'];
+            inputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', () => {
+                        monitor.saveData();
+                        monitor.log("💾 Settings auto-saved", "info");
+                    });
+                }
+            });
+        });
         
         function selectMonitoringOption(option) {
             // Remove selected class from all options
@@ -766,6 +861,7 @@
                 monitor.monitoringOptions = [option];
             }
             
+            monitor.saveData(); // Save immediately
             monitor.log(`📊 Selected monitoring: ${option}`, "info");
         }
         
@@ -779,6 +875,7 @@
             document.getElementById('webhook-setup').style.display = method === 'webhook' ? 'block' : 'none';
             document.getElementById('browser-setup').style.display = method === 'browser' ? 'block' : 'none';
             
+            monitor.saveData(); // Save immediately
             monitor.log(`📧 Selected method: ${method}`, "info");
         }
         
