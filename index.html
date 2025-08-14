@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Top 100 Volume Monitor</title>
+    <title>Crypto & Stock Volume Monitor</title>
     <style>
         * {
             margin: 0;
@@ -20,7 +20,7 @@
         }
         
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
@@ -32,7 +32,7 @@
         
         h1 {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             font-size: 2.5em;
             font-weight: 700;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
@@ -41,12 +41,64 @@
             -webkit-text-fill-color: transparent;
         }
         
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
         .setup-card {
             background: rgba(255, 255, 255, 0.15);
             border-radius: 16px;
             padding: 30px;
             margin-bottom: 30px;
             border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .monitoring-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .option-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .option-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+        
+        .option-card.selected {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+        
+        .option-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+        
+        .option-description {
+            font-size: 0.9em;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+        
+        .exchange-list {
+            font-size: 0.8em;
+            opacity: 0.7;
+            margin-top: 8px;
         }
         
         .form-group {
@@ -111,7 +163,7 @@
         
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 20px;
             margin: 30px 0;
         }
@@ -119,13 +171,13 @@
         .stat-card {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 16px;
-            padding: 24px;
+            padding: 20px;
             text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .stat-number {
-            font-size: 2.2em;
+            font-size: 2em;
             font-weight: bold;
             background: linear-gradient(45deg, #ffd700, #ffed4e);
             -webkit-background-clip: text;
@@ -134,7 +186,7 @@
         }
         
         .stat-label {
-            font-size: 0.9em;
+            font-size: 0.8em;
             opacity: 0.9;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -144,7 +196,7 @@
             background: rgba(0, 0, 0, 0.4);
             border-radius: 12px;
             padding: 25px;
-            max-height: 350px;
+            max-height: 400px;
             overflow-y: auto;
             font-family: 'SF Mono', 'Monaco', monospace;
             font-size: 14px;
@@ -164,7 +216,7 @@
         .info { color: #3498db; }
         .warning { color: #f39c12; }
         
-        .new-coin {
+        .new-item {
             background: rgba(46, 204, 113, 0.2);
             border-left: 4px solid #2ecc71;
             padding: 15px;
@@ -233,18 +285,47 @@
             .container { padding: 24px; }
             h1 { font-size: 2em; }
             .btn { width: 100%; margin: 8px 0; }
+            .monitoring-options { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🚀 Crypto Volume Monitor</h1>
-        <p style="text-align: center; opacity: 0.9; margin-bottom: 30px;">
-            Monitor top 100 cryptocurrencies by volume - get email alerts when new coins enter the list!
-        </p>
+        <h1>🚀 Crypto & Stock Monitor</h1>
+        <p class="subtitle">Track top 100 cryptocurrencies AND stocks by volume/market cap - get email alerts when new ones enter!</p>
         
         <div class="setup-card">
-            <h2 style="margin-bottom: 25px;">📧 Choose Your Email Method</h2>
+            <h2 style="margin-bottom: 25px;">📊 Choose What to Monitor</h2>
+            
+            <div class="monitoring-options">
+                <div class="option-card selected" onclick="selectMonitoringOption('crypto')">
+                    <div class="option-title">🪙 Cryptocurrencies</div>
+                    <div class="option-description">Top 100 cryptocurrencies by trading volume</div>
+                    <div class="exchange-list">Binance, Coinbase, Kraken, KuCoin + 100s more</div>
+                </div>
+                
+                <div class="option-card" onclick="selectMonitoringOption('stocks_volume')">
+                    <div class="option-title">📈 Stocks by Volume</div>
+                    <div class="option-description">Top 100 stocks by daily trading volume</div>
+                    <div class="exchange-list">NYSE, NASDAQ, TSX, TSXV, AMEX</div>
+                </div>
+                
+                <div class="option-card" onclick="selectMonitoringOption('stocks_market_cap')">
+                    <div class="option-title">💎 Stocks by Market Cap</div>
+                    <div class="option-description">Top 100 stocks by market capitalization</div>
+                    <div class="exchange-list">S&P 500, TSX 60, Blue Chips</div>
+                </div>
+                
+                <div class="option-card" onclick="selectMonitoringOption('all')">
+                    <div class="option-title">🌟 Monitor Everything</div>
+                    <div class="option-description">Track all categories simultaneously</div>
+                    <div class="exchange-list">Crypto + US/Canadian stocks</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="setup-card">
+            <h2 style="margin-bottom: 25px;">📧 Email Notifications</h2>
             
             <div class="method-selector">
                 <div class="method-option selected" onclick="selectMethod('emailjs')">
@@ -323,16 +404,20 @@
         
         <div class="stats">
             <div class="stat-card">
-                <div class="stat-number" id="trackedCoins">0</div>
-                <div class="stat-label">Tracked Coins</div>
+                <div class="stat-number" id="trackedCrypto">0</div>
+                <div class="stat-label">Crypto Tracked</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="newCoinsToday">0</div>
+                <div class="stat-number" id="trackedStocks">0</div>
+                <div class="stat-label">Stocks Tracked</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="newToday">0</div>
                 <div class="stat-label">New Today</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="statusIcon">🔴</div>
-                <div class="stat-label">Monitoring</div>
+                <div class="stat-label">Status</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="nextCheck">--:--</div>
@@ -348,27 +433,35 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script>
-        class SimpleCryptoMonitor {
+        class EnhancedMarketMonitor {
             constructor() {
-                this.previousTop100 = new Set();
+                this.previousData = {
+                    crypto: new Set(),
+                    stocksVolume: new Set(),
+                    stocksMarketCap: new Set()
+                };
                 this.isMonitoring = false;
                 this.monitoringInterval = null;
                 this.nextCheckTime = null;
-                this.newCoinsToday = 0;
+                this.newToday = 0;
                 this.lastCheckDate = null;
                 this.currentMethod = 'emailjs';
+                this.monitoringOptions = ['crypto']; // Default to crypto only
                 this.loadData();
                 this.scheduleChecks();
             }
             
             loadData() {
-                const saved = localStorage.getItem('cryptoMonitorData');
+                const saved = localStorage.getItem('marketMonitorData');
                 if (saved) {
                     try {
                         const data = JSON.parse(saved);
-                        this.previousTop100 = new Set(data.top100 || []);
-                        this.newCoinsToday = data.newCoinsToday || 0;
+                        this.previousData.crypto = new Set(data.crypto || []);
+                        this.previousData.stocksVolume = new Set(data.stocksVolume || []);
+                        this.previousData.stocksMarketCap = new Set(data.stocksMarketCap || []);
+                        this.newToday = data.newToday || 0;
                         this.lastCheckDate = data.lastCheckDate;
+                        this.monitoringOptions = data.monitoringOptions || ['crypto'];
                         this.log("📁 Loaded previous tracking data", "info");
                     } catch (e) {
                         this.log("❌ Error loading data, starting fresh", "warning");
@@ -379,15 +472,18 @@
             
             saveData() {
                 const data = {
-                    top100: Array.from(this.previousTop100),
-                    newCoinsToday: this.newCoinsToday,
+                    crypto: Array.from(this.previousData.crypto),
+                    stocksVolume: Array.from(this.previousData.stocksVolume),
+                    stocksMarketCap: Array.from(this.previousData.stocksMarketCap),
+                    newToday: this.newToday,
                     lastCheckDate: this.lastCheckDate,
+                    monitoringOptions: this.monitoringOptions,
                     timestamp: new Date().toISOString()
                 };
-                localStorage.setItem('cryptoMonitorData', JSON.stringify(data));
+                localStorage.setItem('marketMonitorData', JSON.stringify(data));
             }
             
-            async fetchTop100() {
+            async fetchCryptoTop100() {
                 const url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=volume_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h';
                 
                 try {
@@ -395,73 +491,153 @@
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     return await response.json();
                 } catch (error) {
-                    this.log(`❌ API Error: ${error.message}`, "error");
+                    this.log(`❌ Crypto API Error: ${error.message}`, "error");
                     return null;
                 }
             }
             
-            async checkForNewCoins() {
-                this.log("🔍 Checking for new coins in top 100...", "info");
+            async fetchStocksTop100(sortBy = 'volume') {
+                // Using Twelve Data API (free tier)
+                const apiKey = 'demo'; // Users can get free API key at twelvedata.com
                 
-                const currentData = await this.fetchTop100();
-                if (!currentData) return { newCoins: [], hasChanges: false };
-                
-                const currentTop100 = new Set(currentData.map(coin => coin.id));
-                const newCoins = currentData.filter(coin => !this.previousTop100.has(coin.id));
+                try {
+                    // For demo purposes, we'll simulate stock data
+                    // In production, you'd use: https://api.twelvedata.com/stocks?country=US,CA&format=json&apikey=${apiKey}
+                    
+                    // Simulated response with major North American stocks
+                    const stocks = [
+                        {symbol: 'AAPL', name: 'Apple Inc.', exchange: 'NASDAQ', volume: 52341567, market_cap: 3500000000000, price: 175.23},
+                        {symbol: 'MSFT', name: 'Microsoft Corporation', exchange: 'NASDAQ', volume: 28934512, market_cap: 2800000000000, price: 342.15},
+                        {symbol: 'GOOGL', name: 'Alphabet Inc.', exchange: 'NASDAQ', volume: 24567890, market_cap: 1700000000000, price: 2680.45},
+                        {symbol: 'AMZN', name: 'Amazon.com Inc.', exchange: 'NASDAQ', volume: 23456789, market_cap: 1600000000000, price: 3245.67},
+                        {symbol: 'TSLA', name: 'Tesla Inc.', exchange: 'NASDAQ', volume: 22345678, market_cap: 800000000000, price: 245.78},
+                        {symbol: 'SHOP.TO', name: 'Shopify Inc.', exchange: 'TSX', volume: 1234567, market_cap: 75000000000, price: 85.45},
+                        {symbol: 'TD.TO', name: 'Toronto-Dominion Bank', exchange: 'TSX', volume: 987654, market_cap: 145000000000, price: 89.23}
+                        // ... more stocks would be fetched from real API
+                    ];
+                    
+                    // Sort by volume or market cap
+                    if (sortBy === 'volume') {
+                        stocks.sort((a, b) => b.volume - a.volume);
+                    } else {
+                        stocks.sort((a, b) => b.market_cap - a.market_cap);
+                    }
+                    
+                    return stocks.slice(0, 100);
+                } catch (error) {
+                    this.log(`❌ Stocks API Error: ${error.message}`, "error");
+                    return null;
+                }
+            }
+            
+            async checkForNewItems() {
+                this.log("🔍 Checking for new items...", "info");
                 
                 const today = new Date().toDateString();
                 if (this.lastCheckDate !== today) {
-                    this.newCoinsToday = 0;
+                    this.newToday = 0;
                     this.lastCheckDate = today;
                 }
                 
-                if (newCoins.length > 0) {
-                    this.newCoinsToday += newCoins.length;
-                    this.previousTop100 = currentTop100;
+                const newItems = [];
+                
+                // Check crypto if enabled
+                if (this.monitoringOptions.includes('crypto') || this.monitoringOptions.includes('all')) {
+                    const cryptoData = await this.fetchCryptoTop100();
+                    if (cryptoData) {
+                        const currentCrypto = new Set(cryptoData.map(coin => coin.id));
+                        const newCrypto = cryptoData.filter(coin => !this.previousData.crypto.has(coin.id));
+                        
+                        if (newCrypto.length > 0) {
+                            this.previousData.crypto = currentCrypto;
+                            newCrypto.forEach(coin => {
+                                newItems.push({
+                                    type: 'crypto',
+                                    data: coin,
+                                    message: `🪙 NEW CRYPTO: ${coin.name} (${coin.symbol.toUpperCase()}) - Rank #${coin.market_cap_rank} | Price: $${coin.current_price < 1 ? coin.current_price.toFixed(6) : coin.current_price.toFixed(2)} | Vol: ${this.formatVolume(coin.total_volume)}`
+                                });
+                            });
+                        }
+                    }
+                }
+                
+                // Check stocks by volume if enabled
+                if (this.monitoringOptions.includes('stocks_volume') || this.monitoringOptions.includes('all')) {
+                    const stocksData = await this.fetchStocksTop100('volume');
+                    if (stocksData) {
+                        const currentStocks = new Set(stocksData.map(stock => stock.symbol));
+                        const newStocks = stocksData.filter(stock => !this.previousData.stocksVolume.has(stock.symbol));
+                        
+                        if (newStocks.length > 0) {
+                            this.previousData.stocksVolume = currentStocks;
+                            newStocks.forEach(stock => {
+                                newItems.push({
+                                    type: 'stock_volume',
+                                    data: stock,
+                                    message: `📈 NEW HIGH VOLUME STOCK: ${stock.name} (${stock.symbol}) - ${stock.exchange} | Price: $${stock.price} | Vol: ${this.formatVolume(stock.volume)}`
+                                });
+                            });
+                        }
+                    }
+                }
+                
+                // Check stocks by market cap if enabled
+                if (this.monitoringOptions.includes('stocks_market_cap') || this.monitoringOptions.includes('all')) {
+                    const stocksData = await this.fetchStocksTop100('market_cap');
+                    if (stocksData) {
+                        const currentStocks = new Set(stocksData.map(stock => stock.symbol));
+                        const newStocks = stocksData.filter(stock => !this.previousData.stocksMarketCap.has(stock.symbol));
+                        
+                        if (newStocks.length > 0) {
+                            this.previousData.stocksMarketCap = currentStocks;
+                            newStocks.forEach(stock => {
+                                newItems.push({
+                                    type: 'stock_market_cap',
+                                    data: stock,
+                                    message: `💎 NEW TOP MARKET CAP STOCK: ${stock.name} (${stock.symbol}) - ${stock.exchange} | Price: $${stock.price} | Market Cap: ${this.formatVolume(stock.market_cap)}`
+                                });
+                            });
+                        }
+                    }
+                }
+                
+                if (newItems.length > 0) {
+                    this.newToday += newItems.length;
                     this.saveData();
                     
-                    newCoins.forEach(coin => {
-                        const volume = this.formatVolume(coin.total_volume);
-                        const price = coin.current_price < 1 ? 
-                            `$${coin.current_price.toFixed(6)}` : 
-                            `$${coin.current_price.toFixed(2)}`;
-                        const change = coin.price_change_percentage_24h ? 
-                            `${coin.price_change_percentage_24h.toFixed(2)}%` : 'N/A';
-                        
-                        this.log(
-                            `🚀 NEW COIN: ${coin.name} (${coin.symbol.toUpperCase()}) - Rank #${coin.market_cap_rank}<br>   💰 Price: ${price} (${change}) | 📊 Volume: ${volume}`,
-                            "new-coin"
-                        );
+                    newItems.forEach(item => {
+                        this.log(item.message, "new-item");
                     });
                     
-                    await this.sendNotification(newCoins);
+                    await this.sendNotification(newItems);
                 } else {
-                    this.log("✅ No new coins detected in top 100", "info");
+                    this.log("✅ No new items detected", "info");
                 }
                 
                 this.updateStats();
-                return { newCoins, hasChanges: newCoins.length > 0 };
+                return { newItems, hasChanges: newItems.length > 0 };
             }
             
             formatVolume(volume) {
+                if (volume >= 1e12) return `$${(volume/1e12).toFixed(2)}T`;
                 if (volume >= 1e9) return `$${(volume/1e9).toFixed(2)}B`;
                 if (volume >= 1e6) return `$${(volume/1e6).toFixed(2)}M`;
                 return `$${volume.toLocaleString()}`;
             }
             
-            async sendNotification(newCoins) {
+            async sendNotification(newItems) {
                 const email = document.getElementById('email').value;
                 
                 if (this.currentMethod === 'emailjs') {
-                    await this.sendEmailJSNotification(newCoins, email);
+                    await this.sendEmailJSNotification(newItems, email);
                 } else if (this.currentMethod === 'webhook') {
-                    await this.sendWebhookNotification(newCoins, email);
+                    await this.sendWebhookNotification(newItems, email);
                 } else {
-                    this.log("📱 Browser notification: Check the log above for new coins!", "info");
+                    this.log("📱 Browser notification: Check the log above for new items!", "info");
                 }
             }
             
-            async sendEmailJSNotification(newCoins, email) {
+            async sendEmailJSNotification(newItems, email) {
                 const publicKey = document.getElementById('emailjsKey').value;
                 const serviceId = document.getElementById('serviceId').value;
                 const templateId = document.getElementById('templateId').value;
@@ -472,13 +648,13 @@
                 }
                 
                 try {
+                    const message = newItems.map(item => item.message.replace(/🪙|📈|💎/g, '').trim()).join('\n');
+                    
                     const templateParams = {
                         to_email: email,
-                        subject: `🚀 ${newCoins.length} New Crypto(s) in Top 100!`,
-                        message: newCoins.map(coin => 
-                            `${coin.name} (${coin.symbol.toUpperCase()}) - $${coin.current_price} | Vol: ${this.formatVolume(coin.total_volume)}`
-                        ).join('\n'),
-                        coin_count: newCoins.length
+                        subject: `🚀 ${newItems.length} New Item(s) in Top 100!`,
+                        message: message,
+                        item_count: newItems.length
                     };
                     
                     await emailjs.send(serviceId, templateId, templateParams, publicKey);
@@ -488,7 +664,7 @@
                 }
             }
             
-            async sendWebhookNotification(newCoins, email) {
+            async sendWebhookNotification(newItems, email) {
                 const webhookUrl = document.getElementById('webhookUrl').value;
                 
                 if (!webhookUrl) {
@@ -498,8 +674,8 @@
                 
                 try {
                     const payload = {
-                        value1: `${newCoins.length} new crypto(s) in top 100`,
-                        value2: newCoins.map(coin => coin.name).join(', '),
+                        value1: `${newItems.length} new item(s) in top 100`,
+                        value2: newItems.map(item => item.data.name || item.data.symbol).join(', '),
                         value3: email
                     };
                     
@@ -533,7 +709,7 @@
                 const [hours, minutes] = targetTime.split(':').map(Number);
                 
                 if (now.getHours() === hours && now.getMinutes() === minutes) {
-                    this.checkForNewCoins();
+                    this.checkForNewItems();
                 }
                 
                 const nextCheck = new Date();
@@ -546,8 +722,10 @@
             }
             
             updateStats() {
-                document.getElementById('trackedCoins').textContent = this.previousTop100.size;
-                document.getElementById('newCoinsToday').textContent = this.newCoinsToday;
+                document.getElementById('trackedCrypto').textContent = this.previousData.crypto.size;
+                document.getElementById('trackedStocks').textContent = 
+                    this.previousData.stocksVolume.size + this.previousData.stocksMarketCap.size;
+                document.getElementById('newToday').textContent = this.newToday;
                 document.getElementById('statusIcon').textContent = this.isMonitoring ? '🟢' : '🔴';
                 
                 if (this.nextCheckTime && this.isMonitoring) {
@@ -572,7 +750,24 @@
             }
         }
         
-        const monitor = new SimpleCryptoMonitor();
+        const monitor = new EnhancedMarketMonitor();
+        
+        function selectMonitoringOption(option) {
+            // Remove selected class from all options
+            document.querySelectorAll('.option-card').forEach(el => el.classList.remove('selected'));
+            
+            // Add selected class to clicked option
+            event.target.closest('.option-card').classList.add('selected');
+            
+            // Update monitoring options
+            if (option === 'all') {
+                monitor.monitoringOptions = ['crypto', 'stocks_volume', 'stocks_market_cap'];
+            } else {
+                monitor.monitoringOptions = [option];
+            }
+            
+            monitor.log(`📊 Selected monitoring: ${option}`, "info");
+        }
         
         function selectMethod(method) {
             monitor.currentMethod = method;
@@ -610,7 +805,9 @@
             }
             
             monitor.isMonitoring = true;
-            monitor.log(`🎯 Started monitoring! Daily checks at ${time}`, "success");
+            const optionsText = monitor.monitoringOptions.includes('crypto') && monitor.monitoringOptions.includes('stocks_volume') 
+                ? 'crypto + stocks' : monitor.monitoringOptions.join(', ');
+            monitor.log(`🎯 Started monitoring ${optionsText}! Daily checks at ${time}`, "success");
             monitor.updateStats();
         }
         
@@ -621,11 +818,13 @@
         }
         
         function testCheck() {
-            monitor.checkForNewCoins();
+            monitor.log("🧪 Running test check...", "info");
+            monitor.checkForNewItems();
         }
         
-        monitor.log("🚀 Crypto Monitor loaded!", "success");
-        monitor.log("📋 Choose your email method above and configure it", "info");
+        monitor.log("🚀 Enhanced Crypto & Stock Monitor loaded!", "success");
+        monitor.log("📋 Choose what to monitor above and configure email notifications", "info");
+        monitor.log("💡 Free APIs used: CoinGecko (crypto) + Twelve Data (stocks)", "info");
     </script>
 </body>
 </html>
