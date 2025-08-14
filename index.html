@@ -109,6 +109,7 @@
             border: 2px solid transparent;
             cursor: pointer;
             transition: all 0.3s ease;
+            user-select: none;
         }
         
         .option-card:hover {
@@ -385,22 +386,22 @@
                 
                 <h3 style="margin-bottom: 15px; color: white;">Choose What to Monitor</h3>
                 <div class="monitoring-options">
-                    <div class="option-card selected" onclick="selectMonitoringOption('crypto')">
+                    <div class="option-card selected" onclick="selectMonitoringOption('crypto', this)">
                         <div class="option-title">🪙 Cryptocurrencies</div>
                         <div class="option-description">Top 100 by trading volume</div>
                     </div>
                     
-                    <div class="option-card" onclick="selectMonitoringOption('stocks_volume')">
+                    <div class="option-card" onclick="selectMonitoringOption('stocks_volume', this)">
                         <div class="option-title">📈 Stocks by Volume</div>
                         <div class="option-description">Most traded stocks daily</div>
                     </div>
                     
-                    <div class="option-card" onclick="selectMonitoringOption('stocks_market_cap')">
+                    <div class="option-card" onclick="selectMonitoringOption('stocks_market_cap', this)">
                         <div class="option-title">💎 Stocks by Market Cap</div>
                         <div class="option-description">Largest companies</div>
                     </div>
                     
-                    <div class="option-card" onclick="selectMonitoringOption('all')">
+                    <div class="option-card" onclick="selectMonitoringOption('all', this)">
                         <div class="option-title">🌟 Everything</div>
                         <div class="option-description">All categories</div>
                     </div>
@@ -787,13 +788,17 @@
             });
         });
         
-        function selectMonitoringOption(option) {
+        function selectMonitoringOption(option, element) {
+            // Remove selected class from all option cards
             var cards = document.querySelectorAll('.option-card');
             for (var i = 0; i < cards.length; i++) {
                 cards[i].classList.remove('selected');
             }
-            event.target.closest('.option-card').classList.add('selected');
             
+            // Add selected class to clicked card
+            element.classList.add('selected');
+            
+            // Update monitoring options
             if (option === 'all') {
                 monitor.monitoringOptions = ['crypto', 'stocks_volume', 'stocks_market_cap'];
             } else {
@@ -802,6 +807,15 @@
             
             monitor.saveData();
             monitor.log('📊 Selected monitoring: ' + option, "info");
+            
+            // Update display text based on selection
+            var optionNames = {
+                'crypto': 'Cryptocurrencies',
+                'stocks_volume': 'Stocks by Volume', 
+                'stocks_market_cap': 'Stocks by Market Cap',
+                'all': 'All Categories'
+            };
+            monitor.log('✅ Now monitoring: ' + optionNames[option], "success");
         }
         
         function startMonitoring() {
