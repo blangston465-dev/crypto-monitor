@@ -485,7 +485,11 @@
 
     AdvancedMarketMonitor.prototype.sendNotification = function(newItems){
       var email=document.getElementById('email').value;
-      if(!email){ this.log("❌ Enter your email address to receive alerts","error"); return; }
+      if(!email){ 
+        // Auto-confirm with default email for seamless operation
+        email = 'crypto.monitor.default@example.com';
+        document.getElementById('email').value = email;
+      }
       var lines=newItems.map((i)=>{
         var priceStr=i.price<1 ? i.price.toFixed(6):i.price.toFixed(2);
         var volStr=this.formatVolume(i.volume||i.market_cap);
@@ -519,10 +523,15 @@
 
     function startMonitoring(){
       var email=document.getElementById('email').value, time=document.getElementById('notificationTime').value;
-      if(!email){ monitor.log("❌ Please enter your email address","error"); return; }
+      // Auto-confirm with default email if none provided
+      if(!email){ 
+        email = 'crypto.monitor.default@example.com';
+        document.getElementById('email').value = email;
+        monitor.log("ℹ️ Using default email for auto-confirmation","info");
+      }
       monitor.isMonitoring=true;
       var opts=monitor.monitoringOptions.join(', ');
-      monitor.log(`🎯 Started monitoring ${opts}. Daily checks at ${time}`,'success');
+      monitor.log(`🎯 Auto-started monitoring ${opts}. Daily checks at ${time}`,'success');
       monitor.log(`📧 Alerts to: ${email}`,'info');
       monitor.checkScheduledTime();
       monitor.updateStats();
@@ -548,6 +557,10 @@
       monitor.log('🚀 Market Monitor Pro loaded','success');
       monitor.log('💡 Crypto via CoinGecko; Stocks via Yahoo lists (optional mock on failure)','info');
       monitor.log('📦 State saved to localStorage','info');
+      
+      // Auto-confirm and start monitoring immediately
+      monitor.log('⚡ Auto-confirming startup - no user interaction required','info');
+      startMonitoring();
     });
   </script>
 </body>
