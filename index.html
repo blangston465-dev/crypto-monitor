@@ -202,6 +202,9 @@
           this.lastCheckDate = data.lastCheckDate;
           this.monitoringOptions = data.monitoringOptions || ['crypto'];
           this.sevenDayHistory = data.sevenDayHistory || [];
+          this.isMonitoring = !!data.isMonitoring;
+          this.syncOptionCardsFromState();
+          if (this.isMonitoring) { this.checkScheduledTime(); this.log('⏳ Resumed monitoring from saved state','info'); }
           if(data.email) document.getElementById('email').value = data.email;
           if(data.notificationTime) document.getElementById('notificationTime').value = data.notificationTime;
           if(typeof data.useMockStocks === 'boolean') document.getElementById('useMockStocks').checked = data.useMockStocks;
@@ -221,6 +224,7 @@
         lastCheckDate: this.lastCheckDate,
         monitoringOptions: this.monitoringOptions,
         sevenDayHistory: this.sevenDayHistory,
+        isMonitoring: this.isMonitoring,
         email: document.getElementById('email').value,
         notificationTime: document.getElementById('notificationTime').value,
         useMockStocks: document.getElementById('useMockStocks').checked,
@@ -361,6 +365,20 @@
             </div>`;
         }).join('');
       container.innerHTML=html;
+    };
+
+    AdvancedMarketMonitor.prototype.syncOptionCardsFromState = function(){
+      var cards = document.querySelectorAll('.option-card');
+      cards.forEach(function(c){ c.classList.remove('selected'); });
+      var option = 'crypto';
+      if (Array.isArray(this.monitoringOptions)) {
+        if (this.monitoringOptions.length === 3) option = 'all';
+        else if (this.monitoringOptions.length === 1) option = this.monitoringOptions[0];
+      }
+      var indexByOpt = { crypto: 0, stocks_volume: 1, stocks_market_cap: 2, all: 3 };
+      var idx = indexByOpt.hasOwnProperty(option) ? indexByOpt[option] : 0;
+      var el = document.querySelectorAll('.option-card')[idx];
+      if (el) el.classList.add('selected');
     };
 
     AdvancedMarketMonitor.prototype.log = function(msg,type){
@@ -526,9 +544,10 @@
       monitor.log(`📧 Alerts to: ${email}`,'info');
       monitor.checkScheduledTime();
       monitor.updateStats();
+      monitor.saveData();
     }
 
-    function stopMonitoring(){ monitor.isMonitoring=false; monitor.log('⏹️ Stopped monitoring','info'); monitor.updateStats(); }
+    function stopMonitoring(){ monitor.isMonitoring=false; monitor.log('⏹️ Stopped monitoring','info'); monitor.updateStats(); monitor.saveData(); }
     function testCheck(){ monitor.log('🧪 Running test check...','info'); monitor.checkForNewItems(); }
     function refreshLiveTracker(){ monitor.log('🔄 Refreshing tracker...','info'); monitor.updateLiveTracker(); }
 
