@@ -177,7 +177,11 @@
       this.monitoringOptions = ['crypto'];
       this.sevenDayHistory = [];
       this.defaultSettings = { emailjsKey:"D4hLX0Ci5dvUDyB1y", serviceId:"service_dav87mj", templateId:"template_32lyq0e" };
-      this.yahooProxy = "https://api.allorigins.win/raw?url="; // HTTPS CORS proxy
+      this.yahooProxies = [
+        { type: 'prefix', url: 'https://cors.isomorphic-git.org/' },
+        { type: 'query', url: 'https://allorigins.hexlet.app/raw?url=' },
+        { type: 'query', url: 'https://api.allorigins.win/raw?url=' }
+      ];
 
       this.loadData();
       this.scheduleChecks();
@@ -240,6 +244,63 @@
 
     /* ---------- Data sources ---------- */
 
+    // Helper to build proxied URL based on proxy type
+    AdvancedMarketMonitor.prototype.buildProxiedUrl = function(proxy, targetUrl) {
+      if (proxy.type === 'prefix') {
+        return proxy.url + targetUrl;
+      } else if (proxy.type === 'query') {
+        return proxy.url + encodeURIComponent(targetUrl);
+      }
+      throw new Error('Unknown proxy type: ' + proxy.type);
+    };
+
+    // Fetch with fallback across multiple proxies
+    AdvancedMarketMonitor.prototype.fetchWithFallback = function(targetUrl, timeoutMs) {
+      var self = this;
+      timeoutMs = timeoutMs || 6000; // Default 6 second timeout
+      var proxies = Array.isArray(this.yahooProxies) ? this.yahooProxies : [];
+      
+      if (proxies.length === 0) {
+        return Promise.reject(new Error('No proxies configured'));
+      }
+
+      function tryProxy(proxyIndex) {
+        if (proxyIndex >= proxies.length) {
+          return Promise.reject(new Error('All proxies failed'));
+        }
+
+        var proxy = proxies[proxyIndex];
+        var proxiedUrl;
+        
+        try {
+          proxiedUrl = self.buildProxiedUrl(proxy, targetUrl);
+        } catch (e) {
+          return tryProxy(proxyIndex + 1);
+        }
+
+        var controller = new AbortController();
+        var timeoutId = setTimeout(function() {
+          controller.abort();
+        }, timeoutMs);
+
+        return fetch(proxiedUrl, { signal: controller.signal })
+          .then(function(response) {
+            clearTimeout(timeoutId);
+            if (!response.ok) {
+              throw new Error('HTTP ' + response.status + ' from proxy ' + (proxyIndex + 1));
+            }
+            return response.json();
+          })
+          .catch(function(error) {
+            clearTimeout(timeoutId);
+            // Try next proxy on any error (network, timeout, HTTP non-OK)
+            return tryProxy(proxyIndex + 1);
+          });
+      }
+
+      return tryProxy(0);
+    };
+
     // Crypto: CoinGecko Top 100 by volume
     AdvancedMarketMonitor.prototype.fetchCryptoTop100 = function(){
       var url='https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=volume_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h';
@@ -251,10 +312,9 @@
     // Stocks: Yahoo predefined screeners via proxy (returns null if it fails; no mock here)
     AdvancedMarketMonitor.prototype.fetchYahooPredefined = function(scrId){
       var url = 'https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=false&scrIds=' + encodeURIComponent(scrId) + '&count=100';
-      var proxied = this.yahooProxy + encodeURIComponent(url);
       var self=this;
-      return fetch(proxied)
-        .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+      
+      return this.fetchWithFallback(url)
         .then(function(data){
           try{
             var quotes = (data && data.finance && data.finance.result && data.finance.result[0] && data.finance.result[0].quotes) || [];

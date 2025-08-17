@@ -1,0 +1,65 @@
+name: Proxy Health Check
+
+on:
+  schedule:
+    # Run daily at 8 AM UTC
+    - cron: '0 8 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  check-proxies:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Check proxy health
+      run: |
+        # Test URL to verify proxy functionality
+        TEST_URL="https://httpbin.org/json"
+        
+        # Default proxies from the application
+        PROXIES=(
+          "https://cors.isomorphic-git.org/"
+          "https://allorigins.hexlet.app/raw?url="
+          "https://api.allorigins.win/raw?url="
+        )
+        
+        echo "🔍 Testing proxy health..."
+        echo "================================"
+        
+        failed_count=0
+        
+        for i in "${!PROXIES[@]}"; do
+          proxy="${PROXIES[$i]}"
+          echo "Testing proxy $((i+1)): $proxy"
+          
+          if [[ $proxy == *"?url="* ]]; then
+            # Query-style proxy
+            test_url="${proxy}${TEST_URL}"
+          else
+            # Prefix-style proxy  
+            test_url="${proxy}${TEST_URL}"
+          fi
+          
+          if curl -s --max-time 10 "$test_url" > /dev/null; then
+            echo "✅ Proxy $((i+1)) is responding"
+          else
+            echo "❌ Proxy $((i+1)) is not responding"
+            ((failed_count++))
+          fi
+          echo ""
+        done
+        
+        echo "================================"
+        echo "Summary: $((${#PROXIES[@]} - failed_count))/${#PROXIES[@]} proxies responding"
+        
+        if [ $failed_count -eq ${#PROXIES[@]} ]; then
+          echo "🚨 All proxies are failing!"
+          exit 1
+        elif [ $failed_count -gt 0 ]; then
+          echo "⚠️ Some proxies are failing, but at least one is working"
+        else
+          echo "✅ All proxies are healthy"
+        fi
