@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://blangston465-dev.github.io/crypto-monitor/sitemap.xml
+
+# Allow crawling of main pages
+Allow: /index.html
+Allow: /favicon.svg
+
+# Standard crawl delay
+Crawl-delay: 1

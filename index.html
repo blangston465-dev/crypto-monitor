@@ -3,7 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Market Monitor Pro</title>
+  <title>🚀 Market Monitor Pro - Live Crypto &amp; Stock Tracker</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Real-time cryptocurrency and stock market monitoring with 7-day history tracking, email alerts, and comprehensive market analysis.">
+  <meta name="keywords" content="crypto monitor, stock tracker, market analysis, cryptocurrency, trading, finance, real-time data">
+  <meta name="author" content="Market Monitor Pro">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph / Social Media Meta Tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Market Monitor Pro - Live Crypto &amp; Stock Tracker">
+  <meta property="og:description" content="Real-time cryptocurrency and stock market monitoring with 7-day history tracking and email alerts.">
+  <meta property="og:image" content="https://blangston465-dev.github.io/crypto-monitor/og-image.png">
+  <meta property="og:url" content="https://blangston465-dev.github.io/crypto-monitor/">
+  <meta property="og:site_name" content="Market Monitor Pro">
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Market Monitor Pro - Live Crypto &amp; Stock Tracker">
+  <meta name="twitter:description" content="Real-time cryptocurrency and stock market monitoring with 7-day history tracking.">
+  <meta name="twitter:image" content="https://blangston465-dev.github.io/crypto-monitor/og-image.png">
+  
+  <!-- Favicons -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+  
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#ffd700">
+  <meta name="msapplication-TileColor" content="#ffd700">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{
@@ -76,36 +105,74 @@
     body.light-mode .theme-toggle{background:#f1f3f4;color:#202124}
     body.light-mode .option-card:hover{background:rgba(241,243,244,.8)}
     body.light-mode input,body.light-mode select{border-color:rgba(0,0,0,.2)}
+    /* Skip to content link */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 20px;
+      background: #ffd700;
+      color: #000;
+      padding: 8px 16px;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 4px;
+      z-index: 1000;
+      transition: top 0.3s ease;
+    }
+    .skip-link:focus {
+      top: 20px;
+    }
+    
+    /* Improved keyboard navigation */
+    .option-card:focus {
+      outline: 2px solid #ffd700;
+      outline-offset: 2px;
+    }
+    
+    /* Screen reader improvements */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
   </style>
 </head>
 <body>
-  <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+  <a href="#main" class="skip-link">Skip to content</a>
+  
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle between dark and light mode">🌙 Dark Mode</button>
 
-  <div class="container">
-    <div class="header">
+  <div id="main" class="container" role="main">
+    <header class="header">
       <h1>🚀 Market Monitor Pro</h1>
-      <p class="subtitle">Live crypto & stocks with 7‑day history</p>
-    </div>
+      <p class="subtitle">Live crypto &amp; stocks with 7‑day history</p>
+    </header>
 
     <div class="main-grid">
-      <div class="setup-card">
-        <h2 class="card-title">📊 Configuration</h2>
+      <section class="setup-card" aria-labelledby="config-title">
+        <h2 id="config-title" class="card-title">📊 Configuration</h2>
 
         <h3 style="margin-bottom:15px;color:white">Choose What to Monitor</h3>
         <div class="monitoring-options">
-          <div class="option-card selected" onclick="selectMonitoringOption('crypto', this)">
+          <div class="option-card selected" role="button" tabindex="0" aria-pressed="true" onclick="selectMonitoringOption('crypto', this)" onkeydown="handleOptionKeyDown(event,'crypto',this)">
             <div class="option-title">🪙 Cryptocurrencies</div>
             <div class="option-description">Top 100 by volume</div>
           </div>
-          <div class="option-card" onclick="selectMonitoringOption('stocks_volume', this)">
+          <div class="option-card" role="button" tabindex="0" aria-pressed="false" onclick="selectMonitoringOption('stocks_volume', this)" onkeydown="handleOptionKeyDown(event,'stocks_volume',this)">
             <div class="option-title">📈 Stocks by Volume</div>
             <div class="option-description">Yahoo “Most Actives” (100)</div>
           </div>
-          <div class="option-card" onclick="selectMonitoringOption('stocks_market_cap', this)">
+          <div class="option-card" role="button" tabindex="0" aria-pressed="false" onclick="selectMonitoringOption('stocks_market_cap', this)" onkeydown="handleOptionKeyDown(event,'stocks_market_cap',this)">
             <div class="option-title">💎 Stocks by Market Cap</div>
             <div class="option-description">Yahoo “Mega Cap” (100)</div>
           </div>
-          <div class="option-card" onclick="selectMonitoringOption('all', this)">
+          <div class="option-card" role="button" tabindex="0" aria-pressed="false" onclick="selectMonitoringOption('all', this)" onkeydown="handleOptionKeyDown(event,'all',this)">
             <div class="option-title">🌟 Everything</div>
             <div class="option-description">All categories</div>
           </div>
@@ -117,51 +184,61 @@
         </div>
 
         <div class="form-group">
-          <label>📨 Your Email Address:</label>
+          <label for="email">📨 Your Email Address:</label>
           <input type="email" id="email" placeholder="your.email@gmail.com"/>
         </div>
 
         <div class="form-group">
-          <label>⏰ Daily Check Time:</label>
+          <label for="notificationTime">⏰ Daily Check Time:</label>
           <input type="time" id="notificationTime" value="17:00"/>
         </div>
 
         <div style="text-align:center;margin-top:10px">
-          <button class="btn" onclick="startMonitoring()">🎯 Start Monitoring</button>
-          <button class="btn secondary" onclick="stopMonitoring()">⏹️ Stop</button>
-          <button class="btn secondary" onclick="testCheck()">🧪 Test Now</button>
+          <button class="btn" type="button" aria-label="Start monitoring" onclick="startMonitoring()">🎯 Start Monitoring</button>
+          <button class="btn secondary" type="button" aria-label="Stop monitoring" onclick="stopMonitoring()">⛔ Stop</button>
+          <button class="btn secondary" type="button" aria-label="Run a test check now" onclick="testCheck()">🧪 Test Now</button>
         </div>
       </div>
 
-      <div class="live-tracker">
+      <section class="live-tracker" aria-labelledby="live-tracker-title">
         <div class="tracker-header">
-          <h2 class="card-title" style="margin:0">📈 7‑Day Live Tracker</h2>
-          <button class="refresh-btn" onclick="refreshLiveTracker()">🔄 Refresh</button>
+          <h2 id="live-tracker-title" class="card-title" style="margin:0">📈 7‑Day Live Tracker</h2>
+          <button class="refresh-btn" type="button" aria-label="Refresh live tracker" onclick="refreshLiveTracker()">🔄 Refresh</button>
         </div>
-        <div id="liveTrackerContent">
+        <div id="liveTrackerContent" role="region" aria-live="polite" aria-busy="false">
           <div class="empty-state">
             <div class="empty-state-icon">📊</div>
             <p>No new entries in the last 7 days</p>
             <p style="font-size:.8em;margin-top:5px">Run a test check to see how this works!</p>
           </div>
         </div>
-      </div>
+      </section>
     </div>
 
-    <div class="stats">
+    <section class="stats" aria-label="Statistics">
       <div class="stat-card"><div class="stat-number" id="trackedCrypto">0</div><div class="stat-label">Crypto Tracked</div></div>
       <div class="stat-card"><div class="stat-number" id="trackedStocks">0</div><div class="stat-label">Stocks Tracked</div></div>
       <div class="stat-card"><div class="stat-number" id="newToday">0</div><div class="stat-label">New Today</div></div>
       <div class="stat-card"><div class="stat-number" id="sevenDayTotal">0</div><div class="stat-label">7‑Day Total</div></div>
-      <div class="stat-card"><div class="stat-number" id="statusIcon">🔴</div><div class="stat-label">Status</div></div>
+      <div class="stat-card"><div class="stat-number" id="statusIcon" aria-live="polite">🔴</div><div class="stat-label">Status</div></div>
       <div class="stat-card"><div class="stat-number" id="nextCheck">--:--</div><div class="stat-label">Next Check</div></div>
-    </div>
+    </section>
 
-    <div class="setup-card">
-      <h3 class="card-title">📊 Activity Log</h3>
-      <div class="log" id="log"></div>
-    </div>
+    <section class="setup-card" aria-labelledby="activity-log-title">
+      <h3 id="activity-log-title" class="card-title">📊 Activity Log</h3>
+      <div class="log" id="log" role="log" aria-live="polite" aria-atomic="false"></div>
+    </section>
+
+    <footer style="text-align:center;color:#9aa0a6;margin-top:24px;font-size:12px">
+      <p>© <span id="year"></span> Market Monitor Pro • Built for quick insights. <a href="https://github.com/blangston465-dev/crypto-monitor" target="_blank" rel="noopener" style="color:#ffd700">Source</a></p>
+    </footer>
   </div>
+
+  <noscript>
+    <div style="max-width:800px;margin:20px auto;padding:12px;border-radius:8px;background:#fff3cd;color:#856404">
+      This app requires JavaScript to function properly. Please enable JavaScript in your browser.
+    </div>
+  </noscript>
 
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script>
@@ -526,8 +603,21 @@
       }
     }
 
+    function handleOptionKeyDown(event, option, el) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        selectMonitoringOption(option, el);
+      }
+    }
+
     function selectMonitoringOption(option, el){
-      var cards=document.querySelectorAll('.option-card'); cards.forEach(c=>c.classList.remove('selected')); el.classList.add('selected');
+      var cards=document.querySelectorAll('.option-card'); 
+      cards.forEach(c=>{
+        c.classList.remove('selected'); 
+        c.setAttribute('aria-pressed', 'false');
+      }); 
+      el.classList.add('selected');
+      el.setAttribute('aria-pressed', 'true');
       if(option==='all'){ monitor.monitoringOptions=['crypto','stocks_volume','stocks_market_cap']; }
       else{ monitor.monitoringOptions=[option]; }
       monitor.saveData();
@@ -553,6 +643,9 @@
 
     document.addEventListener('DOMContentLoaded', function(){
       monitor = new AdvancedMarketMonitor();
+
+      // Set current year in footer
+      document.getElementById('year').textContent = new Date().getFullYear();
 
       // restore theme
       var savedTheme=localStorage.getItem('theme');
